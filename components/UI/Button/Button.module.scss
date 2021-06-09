@@ -1,0 +1,29 @@
+.Button {
+  padding: 7px;
+  background-color: #000;
+  font-weight: 700;
+  color: #fff;
+  outline: none;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.5;
+  }
+  &--mr {
+    margin-right: 20px;
+  }
+  &:disabled {
+    background-color: #ccc;
+    color: #000;
+    cursor: not-allowed;
+  }
+}
+
+.remove {
+  margin-left: 5px;
+  vertical-align: middle;
+  background-color: #fff;
+  background-repeat: no-repeat;
+  background-image: url(../../../img/icons/trash-solid.svg);
+}
