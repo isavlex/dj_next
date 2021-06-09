@@ -27,7 +27,7 @@ export default function Index() {
         <Flex>
           <Box w={500} p={4} mt={12} mx="auto">
             <Heading as="h2" textAlign="center">
-              Welcome to the home page.
+              Welcome!
             </Heading>
             <Text mt={8} textAlign="center">
               {`User ID: ${user ? user.uid : 'No user signed in'}`}
