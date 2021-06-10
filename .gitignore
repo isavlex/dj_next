@@ -35,4 +35,5 @@ yarn-error.log*
 .vercel
 
 # secret
+pages/auth.js
 secret.json
