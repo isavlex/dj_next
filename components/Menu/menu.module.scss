@@ -1,0 +1,12 @@
+@import '../../styles/mixins.scss';
+
+.mainMenu ul {
+  list-style-type: none;
+  
+  @include breakpoint-mfirst(desktop) {
+    flex-basis: 100%;
+    display: flex;
+    justify-content: space-around;
+    
+  }
+}

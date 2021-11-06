@@ -1,9 +1,10 @@
 import Head from 'next/head'
+import Meny from '../Menu/Meny'
 import Link from 'next/link'
-import {useAuth} from '../../auth'
+import Social from '../Social/Social'
+import {Box, Flex, Heading, Text} from '@chakra-ui/layout'
 
 export default function MainLayout({children, title = ''}) {
-  const {user} = useAuth()
   return (
     <>
       <Head>
@@ -18,33 +19,37 @@ export default function MainLayout({children, title = ''}) {
         />
         <meta charSet="utf-8" />
       </Head>
-      <nav>
-        <Link href="/">Главная</Link>
-        <Link href="/karaoke">Караоке</Link>
-        {user && <Link href="/reviews">Отзывы</Link>}
-        <Link href="/addreview">Добавить отзыв</Link>
-      </nav>
-      <main>{children}</main>
-      <style jsx>{`
-        nav {
-          position: fixed;
-          height: 60px;
-          top: 0;
-          left: 0;
-          right: 0;
-          background: black;
-          display: flex;
-          justify-content: space-around;
-          align-items: center;
-        }
-        nav a {
-          color: white;
-        }
-        main {
-          margin-top: 60px;
-          padding: 1rem;
-        }
-      `}</style>
+      <div className="fluid fluid--black">
+        <header className="header wrapper">
+          <div className="header__logo">
+            <Link href="/">
+              <a className="header__link">DJKARAOKE</a>
+            </Link>
+          </div>
+          <Meny />
+        </header>
+      </div>
+      <div className="fluid">
+        <main className="main wrapper">{children}</main>
+      </div>
+      <Box className="fluid fluid--bt" mt="40px">
+        <Flex
+          className="wrapper"
+          alignItems="center"
+          justifyContent="center"
+          flexDirection="column"
+          minHeight="100px"
+          mt="40px"
+          mb="40px"
+        >
+          <Heading as="h2" mb="15px" size="lg" textAlign="center">Позвоните нам, чтобы забронировать дату</Heading>
+          <a className="link" href="tel:+79164942042">+7 (916) 494-20-42</a>
+          <a className="link" href="mailto:e.alexandrov68@gmail.com?subject=Мероприятие">e.alexandrov68@gmail.com</a>
+          <Text className="center" mb="15px">Адрес: ул. Нижняя Красносельская, д. 45/17</Text>
+          
+          <Social />
+        </Flex>
+      </Box>
     </>
   )
 }

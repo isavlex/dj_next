@@ -1,20 +1,14 @@
 import MainLayout from '../components/layouts/mainLayout'
-import isEmpty from '../utils/utils'
-// import Button from '../components/UI/Button/Button'
-import {createControl, validate, validateForm} from '../form/formUtils'
-// import Input from '../components/UI/Input/Input'
-// import TextArea from '../components/UI/TextArea/TextArea'
-import {useEffect, useRef, useState} from 'react'
+import {useEffect, useState} from 'react'
 import React from 'react'
-import firebaseClient from '../firebaseClient'
 import Cropper from 'react-cropper'
 import {
   Tooltip,
   IconButton,
   Heading,
+  Flex,
   Box,
   Image,
-  Flex,
   Textarea,
   Input,
   FormControl,
@@ -25,7 +19,6 @@ import {
   Stack,
   useToast,
   InputGroup,
-  InputLeftAddon,
 } from '@chakra-ui/react'
 import 'cropperjs/dist/cropper.css'
 import classes from '../styles/add-review.module.scss'
@@ -33,55 +26,97 @@ import {FiRotateCw} from 'react-icons/fi'
 import {BsCrop} from 'react-icons/bs'
 import {AiOutlineZoomIn, AiOutlineZoomOut} from 'react-icons/ai'
 import imageCompression from 'browser-image-compression'
-import validator from 'validator'
+import {useForm} from 'react-hook-form'
+import {useRouter} from 'next/router'
+import {route} from 'next/dist/next-server/server/router'
 
 export default function AddReview() {
-  const db = firebaseClient()
-  const [dash, setDash] = useState('none')
-  const [choose, setChoose] = useState('Добавить фото')
+  const [chooseImage, setChooseImage] = useState({
+    dash: 'none',
+    buttonText: 'Выбрать фото',
+    image: null,
+    cropImage: null,
+    error: false,
+  })
+
   const [cropper, setCropper] = useState()
-  const [image, setImage] = useState(null)
-  const [cropImage, setCropImage] = useState(null)
+  const [review, setReview] = useState(null)
   const toast = useToast()
-  const [name, setName] = useState('')
-  const [eventState, setEventState] = useState('')
-  const [invalidEvent, setInvalidEvent] = useState('')
-  const [invalidName, setInvalidName] = useState(false)
-  const [text, setText] = useState('')
-  const [invalidText, setInvalidText] = useState(false)
-  const [review, setReview] = useState({})
-  const [imageBlob, setImageBlob] = useState()
-  const [link, setLink] = useState('')
-  const [invalidLink, setInvalidLink] = useState()
+  const router = useRouter()
+
+  const {
+    register,
+    handleSubmit,
+    formState: {errors},
+    reset,
+  } = useForm()
 
   useEffect(async () => {
-    if (isEmpty(review)) {
-      const idReview = Date.now()
-      const updatesReview = {}
-      const updatesImage = {}
-      const url = 'mail_review.php'
-      updatesImage[idReview] = cropImage
-      updatesReview[idReview] = review
-      await db
-        .ref('reviews')
-        .update(updatesReview)
-        .catch((error) => {
-          console.log(error)
-        })
-      await db
-        .ref('images')
-        .update(updatesImage)
-        .catch((error) => {
-          console.log(error)
-        })
-      
-      await fetch(url, {
+    if (review) {
+      addReview()
+      addImage()
+      sendNotification()
+    }
+  }, [review])
+
+  const addReview = async () => {
+    try {
+      const res = await fetch(`${process.env.API_URL}api/reviews`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify(review),
       })
+      setReview(null)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
+  const addImage = async () => {
+    const img = {
+      _id: review._id,
+      image: chooseImage.cropImage,
+    }
+    try {
+      const res = await fetch(`${process.env.API_URL}api/images`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(img),
+      })
+      setChooseImage({
+        dash: 'none',
+        buttonText: 'Выбрать фото',
+        image: null,
+        cropImage: null,
+        error: false,
+      })
+      router.push('/')
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const sendNotification = async () => {
+    try {
+      const res = await fetch(`${process.env.API_URL}api/contact`, {
+        method: 'POST',
+        headers: {
+          'Contents-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: review._id,
+          text: review.review,
+        }),
+      })
+    } catch (err) {
+      console.log(err)
+    } finally {
       toast({
         title: 'Отзыв отправлен',
         description: 'Ваш отзыв появится после модерации',
@@ -90,17 +125,7 @@ export default function AddReview() {
         isClosable: true,
       })
     }
-  }, [review])
-
-  useEffect(() => {
-    if (imageBlob) {
-      const reader = new FileReader()
-      reader.onload = () => {
-        setImage(reader.result)
-      }
-      reader.readAsDataURL(imageBlob)
-    }
-  }, [imageBlob])
+  }
 
   const getToast = (message) => {
     toast({
@@ -112,192 +137,108 @@ export default function AddReview() {
 
     return
   }
-  const compressImage = (file) => {
-    const options = {
-      maxSizeMB: 10,
-      maxWidthOrHeight: 600,
-    }
-    imageCompression(file, options)
-      .then((compressedBlob) => {
-        setImageBlob(compressedBlob)
-      })
-      .catch((e) => {
-        console.log(e)
-      })
-  }
 
-  const addReviewHandler = (event) => {
-    event.preventDefault()
-    if (!cropImage) {
-      getToast('Добавьте фото и нажмите кнопку "Обрезать"')
-      return
-    }
-
-    if (!name || !text || !eventState) {
-      getToast('Заполните все поля!')
-      return
-    }
-
-    setReview({
-      checked: false,
-      published: false,
-      name,
-      review: text,
-      event: eventState,
-      link,
-    })
-
-    setText('')
-    setName('')
-    setEventState('')
-    setLink('')
-  }
-
-  const fileChangeHandler = (e) => {
+  const fileChangeHandler = async (e) => {
     e.preventDefault()
-    // const limitSize = 3145728
+
     if (e.target) {
       const file = e.target.files[0]
-
-      compressImage(file)
-      setChoose(`Выбрано ${e.target.files.length} фото`)
-      setDash('block')
-      // const reader = new FileReader()
-      // reader.onload = () => {
-      //   setImage(reader.result)
-      // }
-      // reader.readAsDataURL(file)
-      // if (file[0].size <= limitSize) {
-      //   setChoose(`Выбрано ${e.target.files.length} фото`)
-      //   setDash('block')
-      //   const reader = new FileReader()
-
-      //   reader.onload = () => {
-      //     setImage(reader.result)
-      //   }
-      //   reader.readAsDataURL(file[0])
-      // }
-    } else {
-      toast({
-        title: 'Большой размер',
-        description: 'Размер фото не должен превышать 3-х мегабайт.',
-        status: 'error',
-        duration: 9000,
-        isClosable: true,
-      })
+      const options = {
+        maxSizeMB: 10,
+        maxWidthOrHeight: 600,
+      }
+      try {
+        const compressedImage = await imageCompression(file, options)
+        const reader = new FileReader()
+        reader.onload = () => {
+          setChooseImage({
+            ...chooseImage,
+            dash: 'block',
+            buttonText: `Выбрано ${e.target.files.length} фото`,
+            image: reader.result,
+          })
+        }
+        reader.readAsDataURL(compressedImage)
+      } catch (e) {
+        console.log(e)
+      }
     }
-    // compressImage(file)
   }
 
   const cropHandler = () => {
     if (typeof cropper !== 'undefined') {
-      setCropImage(cropper.getCroppedCanvas().toDataURL())
-    }
-  }
-
-  const rotateHandler = () => {
-    setCropper(cropper.rotate(90))
-  }
-
-  const zoomHandlerPlus = () => {
-    setCropper(cropper.zoom(0.1))
-  }
-
-  const zoomHandlerMinus = () => {
-    setCropper(cropper.zoom(-0.1))
-  }
-
-  const nameBlurHandler = () => {
-    if (name.length < 2) {
-      setInvalidName(true)
-      toast({
-        title: 'Введите корректное имя!',
-        description: 'Имя должно содержать 2 и более символов.',
-        status: 'info',
-        duration: 9000,
-        isClosable: true,
+      setChooseImage({
+        ...chooseImage,
+        cropImage: cropper.getCroppedCanvas().toDataURL(),
       })
-    } else {
-      setInvalidName(false)
     }
   }
 
-  const textBlurHandler = () => {
-    if (text.length < 5) {
-      setInvalidText(true)
-      toast({
-        title: 'Слишком коротко!',
-        description: 'Текст отзыва должен содержать минимум 5 символов.',
-        status: 'info',
-        duration: 9000,
-        isClosable: true,
-      })
-    } else {
-      setInvalidText(false)
+  const submitHandler = (values) => {
+    const _id = Date.now()
+    if (!chooseImage.cropImage) {
+      getToast('Добавьте фото и нажмите кнопку "Обрезать"')
+      return
     }
-  }
 
-  const eventBlurHandler = () => {
-    if (eventState.length < 4) {
-      setInvalidEvent(true)
-      toast({
-        title: 'Слишком коротко!',
-        description: 'Текст мероприятия должен содержать минимум 4 символов.',
-        status: 'info',
-        duration: 9000,
-        isClosable: true,
-      })
-    } else {
-      setInvalidEvent(false)
-    }
-  }
-
-  const linkChangeHandler = (e) => {
-    const reg = /^(http|https):\/\//
-    const value = e.target.value
-    const newValue = value.replace(reg, '')
-
-    validator.isURL(newValue) ? setLink(newValue.trim()) : getToast('Введите корректный URL-адрес')
+    setReview({
+      _id,
+      checked: false,
+      published: false,
+      name: values.name,
+      review: values.text,
+      event: values.event,
+      link: values.link,
+    })
+    reset()
   }
 
   return (
     <MainLayout title="Добавить отзыв">
-      <Heading as="h1">Добавить отзыв</Heading>
-      <form>
-        <Box maxWidth={320}>
-          <HStack display={dash} mt={30} mb={30}>
-            <Tooltip hasArrow placement="top" label="Перевернуть" bg="black">
-              <IconButton onClick={rotateHandler} icon={<FiRotateCw />} />
-            </Tooltip>
-            <Tooltip hasArrow placement="top" label="Увеличить" bg="black">
-              <IconButton
-                onClick={zoomHandlerPlus}
-                icon={<AiOutlineZoomIn />}
-              />
-            </Tooltip>
-            <Tooltip hasArrow placement="top" label="Уменьшить" bg="black">
-              <IconButton
-                onClick={zoomHandlerMinus}
-                icon={<AiOutlineZoomOut />}
-              />
-            </Tooltip>
-            <Tooltip hasArrow placement="top" label="Обрезать" bg="black">
-              <Button
-                onClick={cropHandler}
-                leftIcon={<BsCrop />}
-                colorScheme="teal"
-              >
-                Обрезать
-              </Button>
-            </Tooltip>
-          </HStack>
+      <Heading as="h1" textAlign="center" m="40px 0">
+        Добавить отзыв
+      </Heading>
+      <Box maxWidth={320}>
+        <form onSubmit={handleSubmit(submitHandler)}>
+          <Flex justifyContent="center">
+            <HStack display={chooseImage.dash} mt={30} mb={30}>
+              <Tooltip hasArrow placement="top" label="Перевернуть" bg="black">
+                <IconButton
+                  onClick={() => setCropper(cropper.rotate(90))}
+                  icon={<FiRotateCw />}
+                />
+              </Tooltip>
+              <Tooltip hasArrow placement="top" label="Увеличить" bg="black">
+                <IconButton
+                  onClick={() => setCropper(cropper.zoom(0.1))}
+                  icon={<AiOutlineZoomIn />}
+                />
+              </Tooltip>
+              <Tooltip hasArrow placement="top" label="Уменьшить" bg="black">
+                <IconButton
+                  onClick={() => setCropper(cropper.zoom(-0.1))}
+                  icon={<AiOutlineZoomOut />}
+                />
+              </Tooltip>
+              <Tooltip hasArrow placement="top" label="Обрезать" bg="black">
+                <Button
+                  onClick={cropHandler}
+                  leftIcon={<BsCrop />}
+                  colorScheme="teal"
+                >
+                  Обрезать
+                </Button>
+              </Tooltip>
+            </HStack>
+          </Flex>
+
           <Stack>
             <Cropper
               style={{maxHeight: 320, width: '100%'}}
               zoomTo={0.1}
               initialAspectRatio={1}
               aspectRatio={1 / 1}
-              src={image}
+              src={chooseImage.image}
               viewMode={1}
               guides={true}
               minCropBoxHeight={10}
@@ -310,14 +251,14 @@ export default function AddReview() {
                 setCropper(instance)
               }}
             />
-            <Image src={cropImage} />
+            <Image src={chooseImage.cropImage} />
           </Stack>
 
           <Box>
-            <FormControl isRequired>
+            <FormControl>
               <Box w={160} mb={15} mt={15}>
                 <FormLabel className={classes.addPhoto} textAlign="center">
-                  {choose}
+                  {chooseImage.buttonText}
                 </FormLabel>
                 <Input
                   type="file"
@@ -327,82 +268,112 @@ export default function AddReview() {
                   w={0.1}
                   h={0.1}
                   pos="absolute"
-                ></Input>
-
-                <FormErrorMessage></FormErrorMessage>
+                />
               </Box>
             </FormControl>
           </Box>
-          <Box flexBasis={320}>
-            <FormControl isRequired>
-              <FormLabel>Введите ваше имя</FormLabel>
+          <FormControl isInvalid={errors.name}>
+            <FormLabel htmlFor="name">Введите ваше имя</FormLabel>
+            <Input
+              type="text"
+              id="name"
+              {...register('name', {
+                required: 'Необходимо заполнить',
+                minLength: {
+                  value: 2,
+                  message: 'Минимальное кол-во символов 2',
+                },
+                maxLength: {
+                  value: 80,
+                  message: 'Максимальное кол-во символов 80',
+                },
+              })}
+              errorBorderColor="red.500"
+            />
+            <FormErrorMessage>
+              {errors.name && errors.name.message}
+            </FormErrorMessage>
+          </FormControl>
+          <FormControl isInvalid={errors.link}>
+            <FormLabel htmlFor="link">Ссылка на профиль</FormLabel>
+            <InputGroup size="sm">
+              {/* <InputLeftAddon children="https://" /> */}
               <Input
-                isInvalid={invalidName}
                 type="text"
-                onChange={(e) => {
-                  setName(e.target.value)
-                }}
-                value={name}
-                onBlur={nameBlurHandler}
+                id="link"
+                {...register('link', {
+                  required: 'Необходимо заполнить',
+                  minLength: {
+                    value: 4,
+                    message: 'Минимальное кол-во символов 4',
+                  },
+                  maxLength: {
+                    value: 80,
+                    message: 'Максимальное кол-во символов 80',
+                  },
+                })}
                 errorBorderColor="red.500"
               ></Input>
-              <FormErrorMessage></FormErrorMessage>
-            </FormControl>
-            <FormControl>
-              <FormLabel>Ссылка на профиль</FormLabel>
-              <InputGroup size="sm">
-                <InputLeftAddon children="https://" />
-                <Input
-                  isInvalid={invalidLink}
-                  type="text"
-                  onChange={linkChangeHandler}
-                  value={link}
-                  errorBorderColor="red.500"
-                ></Input>
-              </InputGroup>
-              <FormErrorMessage></FormErrorMessage>
-            </FormControl>
-            <FormControl isRequired>
-              <FormLabel>Мероприятие</FormLabel>
-              <Input
-                isInvalid={invalidEvent}
-                type="text"
-                onChange={(e) => {
-                  setEventState(e.target.value)
-                }}
-                value={eventState}
-                onBlur={eventBlurHandler}
-                errorBorderColor="red.500"
-              ></Input>
-              <FormErrorMessage></FormErrorMessage>
-            </FormControl>
-            <FormControl isRequired>
-              <FormLabel>Введите ваш отзыв</FormLabel>
-              <Textarea
-                value={text}
-                isInvalid={invalidText}
-                onChange={(e) => {
-                  setText(e.target.value)
-                }}
-                onBlur={textBlurHandler}
-              ></Textarea>
-              <FormErrorMessage></FormErrorMessage>
-            </FormControl>
-            <Box>
-              <Button
-                onClick={addReviewHandler}
-                bg="black"
-                color="white"
-                isDisabled={text === '' || cropImage === null || name === null}
-                _hover={{opacity: 0.7}}
-                _active={{opacity: 0.9}}
-              >
-                Добавить отзыв
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-      </form>
+            </InputGroup>
+            <FormErrorMessage>
+              {errors.link && errors.link.message}
+            </FormErrorMessage>
+          </FormControl>
+          <FormControl isInvalid={errors.event}>
+            <FormLabel htmlFor="event">Мероприятие</FormLabel>
+            <Input
+              type="text"
+              id="event"
+              {...register('event', {
+                required: 'Необходимо заполнить',
+                minLength: {
+                  value: 2,
+                  message: 'Минимальное кол-во символов 2',
+                },
+                maxLength: {
+                  value: 60,
+                  message: 'Максимальное кол-во символов 60',
+                },
+              })}
+              errorBorderColor="red.500"
+            ></Input>
+            <FormErrorMessage>
+              {errors.event && errors.event.message}
+            </FormErrorMessage>
+          </FormControl>
+          <FormControl isInvalid={errors.text}>
+            <FormLabel htmlFor="text">Введите ваш отзыв</FormLabel>
+            <Textarea
+              id="text"
+              {...register('text', {
+                required: 'Необходимо заполнить',
+                minLength: {
+                  value: 5,
+                  message: 'Минимальное кол-во символов 5',
+                },
+                maxLength: {
+                  value: 280,
+                  message: 'Максимальное кол-во символов 280',
+                },
+              })}
+            ></Textarea>
+            <FormErrorMessage>
+              {errors.text && errors.text.message}
+            </FormErrorMessage>
+          </FormControl>
+
+          <Button
+            mt="15px"
+            type="submit"
+            bg="black"
+            color="white"
+            _hover={{opacity: 0.7}}
+            _active={{opacity: 0.9}}
+          >
+            Добавить отзыв
+          </Button>
+        </form>
+      </Box>
     </MainLayout>
   )
 }

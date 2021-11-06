@@ -1,0 +1,74 @@
+.social {
+  bottom: 30px;
+  display: flex;
+  justify-content: center;
+  &--fluid {
+    position: static;
+  }
+}
+
+.social__link {
+  $amount: 5;
+  margin-right: 10px;
+  &--fluid {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    width: percentage(1 / $amount);
+  }
+}
+
+.social__icon {
+  width: 30px;
+  height: 30px;
+}
+
+.social__facebook {
+  @extend .social__icon;
+  background: url(/img/icons/facebook-black.svg) 50% no-repeat;
+  &--fluid {
+    width: 100%;
+    background: url(/img/icons/facebook-white.svg) 50% no-repeat #3c5998;
+  }
+}
+.social__vk {
+  @extend .social__icon;
+  background: url(/img/icons/vk-black.svg) 50% no-repeat;
+  &--fluid {
+    width: 100%;
+    background: url(/img/icons/vk-white.svg) 50% no-repeat #47709c;
+  }
+}
+.social__instagram {
+  @extend .social__icon;
+  background: url(/img/icons/instagram-black.svg) 50% no-repeat;
+  &--fluid {
+    width: 100%;
+    background: url(/img/icons/instagram-white.svg) 50% no-repeat #5851dc;
+  }
+}
+.social__youtube {
+  @extend .social__icon;
+  background: url(/img/icons/youtube-black.svg) 50% no-repeat;
+  &--fluid {
+    width: 100%;
+    background: url(/img/icons/youtube-white.svg) 50% no-repeat #e62017;
+  }
+}
+.social__soundcloud {
+  @extend .social__icon;
+  background: url(/img/icons/soundcloud-black.svg) 50% no-repeat;
+  &--fluid {
+    width: 100%;
+    background: url(/img/icons/soundcloud-white.svg) 50% no-repeat #f95500;
+  }
+}
+.social__telegram {
+  @extend .social__icon;
+
+  background: url(/img/icons/telegram-black.svg) 50% no-repeat;
+  &--fluid {
+    width: 100%;
+    background: url(/img/icons/telegram-white.svg) 50% no-repeat #30a3e1;
+  }
+}

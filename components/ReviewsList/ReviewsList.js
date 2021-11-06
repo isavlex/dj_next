@@ -1,42 +1,45 @@
 import Link from 'next/link'
 import isEmpty from '../../utils/utils'
-import Button from '../UI/Button/Button'
+import {
+  OrderedList,
+  ListItem,
+  Text,
+  IconButton,
+} from '@chakra-ui/react'
+import Remove from '../Remove/Remove'
+import {CgArrowsExchangeAltV} from 'react-icons/cg'
 
 export default function ReviewsList(props) {
   return (
-    <ol className="list-group">
-      {isEmpty(props.reviews) ? (
-        Object.keys(props.reviews).map((reviewName, index) => {
+    <OrderedList>
+      {!isEmpty(props.reviews) ? (
+        props.reviews.map((review, index) => {
           return (
-            <li
+            <ListItem
               key={index}
-              className="list-group-item d-flex justify-content-between"
+              className="list-group-item"
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
             >
-              {/* <Input
-              type={'checkbox'}
-              inputClass="btn-check"
-              onChange={props.inputCheckboxHandler.bind(this, reviewName)}
-            /> */}
-
-              <input
-                type="checkbox"
-                className="btn=check"
-                onChange={props.inputCheckboxHandler.bind(this, reviewName)}
-                checked={props.reviews[reviewName].checked}
+              <IconButton
+                onClick={props.clickPublishHandler.bind(this, review._id)}
+                icon={<CgArrowsExchangeAltV />}
+                mr={3}
               />
-              <Link href={`/review/[id]`} as={`/review/${reviewName}`}>
-                {props.reviews[reviewName].name}
+              <Link href={`/review/[id]`} as={`/review/${review._id}`}>
+                {review.name}
               </Link>
-              <Button
-                addMod="remove"
-                onClick={props.removeItemHandler.bind(this, reviewName)}
+              <Remove
+                trash={true}
+                onClick={props.removeItemHandler.bind(this, review._id)}
               />
-            </li>
+            </ListItem>
           )
         })
       ) : (
-        <p>Нет отзывов!</p>
+        <Text>Нет отзывов!</Text>
       )}
-    </ol>
+    </OrderedList>
   )
 }

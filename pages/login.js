@@ -1,6 +1,5 @@
 import React, {useState} from 'react'
-import Link from 'next/link'
-import router, { useRouter } from 'next/router'
+import { useRouter } from 'next/router'
 import firebaseClient from '../firebaseClient'
 import firebase from 'firebase/app'
 import 'firebase/auth'
@@ -11,13 +10,12 @@ import {
   Input,
   FormControl,
   FormLabel,
-  FormHelperText,
-  FormErrorMessage,
   Stack,
   Button,
   Heading,
   useToast,
 } from '@chakra-ui/react'
+import MainLayout from '../components/layouts/mainLayout'
 
 
 export default function Login({props}) {
@@ -38,7 +36,7 @@ export default function Login({props}) {
       .signInWithEmailAndPassword(email, pass)
       .then(function (firebaseUser) {
         // window.location.href = '/'
-        router.push('/reviews')
+        router.push('/reviews-admin')
       })
       .catch(function (error) {
         const message = error.message
@@ -53,6 +51,7 @@ export default function Login({props}) {
   }
 
   return (
+    <MainLayout title={'Reviews page'}>
     <Flex>
       <Box w={500} p={4} my={12} mx="auto">
         <Heading textAlign="center" as="h2">
@@ -118,5 +117,6 @@ export default function Login({props}) {
         </Stack>
       </Box>
     </Flex>
+    </MainLayout>
   )
 }
