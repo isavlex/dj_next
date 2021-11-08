@@ -34,11 +34,11 @@ export default function Review({query}) {
   useEffect(async () => {
     try {
       const reviewRes = await fetch(
-        `${process.env.API_URL}api/reviews/${query.id}`
+        `../api/reviews/${query.id}`
       )
       const {data: review} = await reviewRes.json()
       const imageRes = await fetch(
-        `${process.env.API_URL}api/images/${query.id}`
+        `../api/images/${query.id}`
       )
       const {data: image} = await imageRes.json()
       setImageState(image.image)

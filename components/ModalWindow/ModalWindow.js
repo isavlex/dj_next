@@ -31,7 +31,7 @@ export default function ModalWindow(props) {
   } = useForm()
 
   const submitHandler = async (values) => {
-    const url = `${process.env.API_URL}api/order`
+    const url = `api/order`
     try {
       const res = await fetch(url, {
         method: 'POST',

@@ -24,7 +24,7 @@ export default function Login({props}) {
   const [email, setEmail] = useState('')
   const [invalidEmail, setInvalidEmail] = useState(false)
   const [pass, setPass] = useState('')
-  const router = useRouter()
+  // const router = useRouter()
 
   const emailBlurHandler = () => {
     validator.isEmail(email) ? setInvalidEmail(false) : setInvalidEmail(true)
@@ -35,8 +35,8 @@ export default function Login({props}) {
       .auth()
       .signInWithEmailAndPassword(email, pass)
       .then(function (firebaseUser) {
-        // window.location.href = '/'
-        router.push('/reviews-admin')
+        window.location.href = '/reviews-admin'
+        // router.push('/reviews-admin')
       })
       .catch(function (error) {
         const message = error.message

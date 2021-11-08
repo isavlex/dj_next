@@ -16,7 +16,7 @@ export default async (req, res) => {
   try {
     const emailRes = await transporter.sendMail({
       from: process.env.user,
-      to: 'mailsavlex@gmail.com',
+      to: 'e.alexandrov68@gmail.com',
       subject: `Заказ ${data.order}`,
       html: `<p>Поступил заказ: ${data.name} / ${data.phone}</p>`,
     })

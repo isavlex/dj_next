@@ -7,8 +7,7 @@ import {useState, useEffect} from 'react'
 import ReviewsList from '../components/ReviewsList/ReviewsList'
 import Logout from '../components/Logout/Logout'
 
-export default function ReviewsAdmin({reviews, session}) {
-  console.log(session)
+export default function ReviewsAdmin({reviews}) {
   const [state, setState] = useState({
     reviews,
     publishedReviews: null,
@@ -146,7 +145,6 @@ export async function getServerSideProps(context) {
     const cookies = nookies.get(context)
     const token = await verifyIdToken(cookies.token)
     const {uid, email} = token
-
     // connect to db
     const reviewsRes = await fetch(`${process.env.API_URL}api/reviews`)
     const {data: reviews} = await reviewsRes.json()
