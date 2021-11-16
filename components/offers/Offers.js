@@ -23,7 +23,7 @@ export default function Offers(props) {
               <Image src={`./img/offers/${offer.img}`} w={'100%'} />
             </Box>
 
-            <Heading as="h3" fontSize="xl" m={'15px 0'}>
+            <Heading as="h3" fontSize="xl" m={'15px 5px'} >
               {offer.heading}
             </Heading>
             <Box className={styles.stretchOut}>

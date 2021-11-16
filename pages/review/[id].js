@@ -128,7 +128,7 @@ export default function Review({query}) {
             <Heading as="h1" mt={30} mb={30} textAlign="center">
               {reviewState.name}
             </Heading>
-            <Skeleton isLoaded={imageState}>
+            <Skeleton isLoaded={imageState} mb={3}>
               <Flex justifyContent="center">
                 <Image boxSize="300px" mb={30} src={imageState} />
               </Flex>
@@ -181,7 +181,7 @@ export default function Review({query}) {
               >
                 Изменить
               </Button>
-              <Link href="/reviews-admin">Назад ко всем отзываам</Link>
+              <Link href="/reviews-admin">Назад ко всем отзывам</Link>
             </Flex>
           </Box>
         </Flex>

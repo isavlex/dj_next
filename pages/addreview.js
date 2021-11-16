@@ -198,7 +198,7 @@ export default function AddReview() {
       <Heading as="h1" textAlign="center" m="40px 0">
         Добавить отзыв
       </Heading>
-      <Box maxWidth={320}>
+      <Box maxWidth={320} p={3}>
         <form onSubmit={handleSubmit(submitHandler)}>
           <Flex justifyContent="center">
             <HStack display={chooseImage.dash} mt={30} mb={30}>

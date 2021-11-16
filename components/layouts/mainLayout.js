@@ -4,7 +4,9 @@ import Link from 'next/link'
 import Social from '../Social/Social'
 import {Box, Flex, Heading, Text} from '@chakra-ui/layout'
 
+
 export default function MainLayout({children, title = ''}) {
+
   return (
     <>
       <Head>

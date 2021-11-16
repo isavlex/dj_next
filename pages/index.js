@@ -1,7 +1,7 @@
-
 import MainLayout from '../components/layouts/mainLayout'
 import {Box, Text, Heading} from '@chakra-ui/react'
 import Skills from '../components/slills/Skills'
+import Services from '../components/Services/Services'
 
 export default function Index() {
   return (
@@ -21,6 +21,7 @@ export default function Index() {
             Выбирая нас, Вы получаете
           </Heading>
           <Skills />
+          <Services />
         </Box>
       </Box>
     </MainLayout>

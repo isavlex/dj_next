@@ -5,6 +5,8 @@ import {
   ListItem,
   Text,
   IconButton,
+  Skeleton,
+  Box,
 } from '@chakra-ui/react'
 import Remove from '../Remove/Remove'
 import {CgArrowsExchangeAltV} from 'react-icons/cg'
@@ -38,7 +40,9 @@ export default function ReviewsList(props) {
           )
         })
       ) : (
-        <Text>Нет отзывов!</Text>
+        <Text>
+          Нет отзывов!
+        </Text>
       )}
     </OrderedList>
   )

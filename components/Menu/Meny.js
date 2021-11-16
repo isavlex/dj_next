@@ -15,7 +15,7 @@ export default function Menu() {
   const {isOpen, onOpen, onClose} = useDisclosure()
   return (
     <nav className={styles.mainMenu}>
-      <Button onClick={onOpen} colorScheme="blackAlpha" rightIcon={<GiHamburgerMenu fontSize="2rem"/>} mr="40px">
+      <Button onClick={onOpen} colorScheme="blackAlpha" rightIcon={<GiHamburgerMenu fontSize="2rem"/>}>
         Меню
       </Button>
       <Drawer placement="right" onClose={onClose} isOpen={isOpen}>

@@ -13,11 +13,11 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
+  Box,
 } from '@chakra-ui/react'
 import {useState, useEffect, useRef} from 'react'
 import {useForm} from 'react-hook-form'
 import NumberFormat from 'react-number-format'
-
 
 export default function ModalWindow(props) {
   const toast = useToast()
@@ -62,16 +62,17 @@ export default function ModalWindow(props) {
 
   return (
     <>
-      <Button
-        mt={15}
-        data-order={props.heading}
-
-        colorScheme="blackAlpha"
-        bg="black"
-        onClick={onOpen}
-      >
-        {props.textOffer ? props.textOffer : 'Забронировать'}
-      </Button>
+      <Box>
+        <Button
+          mt={15}
+          data-order={props.heading}
+          colorScheme="blackAlpha"
+          bg="black"
+          onClick={onOpen}
+        >
+          {props.textOffer ? props.textOffer : 'Забронировать'}
+        </Button>
+      </Box>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />

@@ -1,6 +1,6 @@
 import data from './data.js'
 import styles from './skills.module.scss'
-import {Heading, Text, Box, Flex} from '@chakra-ui/react'
+import {Text, Box, Flex} from '@chakra-ui/react'
 
 export default function Skills() {
   return (
@@ -15,9 +15,9 @@ export default function Skills() {
               />
             </Box>
             <Box>
-              <Heading as="h3" size="md">
+              <Text fontWeight="700" fontSize="2xl">
                 {skill.heading}
-              </Heading>
+              </Text>
               <Text fontSize="xl">{skill.text}</Text>
             </Box>
           </Flex>

@@ -1,8 +1,16 @@
 import {useRef, useEffect} from 'react'
 import ReactDOMServer from 'react-dom/server'
-import isEmpty from '../../utils/utils'
 import {Fancybox, Carousel as FancyCarousel} from '@fancyapps/ui'
 import '@fancyapps/ui/dist/fancybox.css'
+import {
+  Heading,
+  Skeleton,
+  SkeletonText,
+  SkeletonCircle,
+  Box,
+  Text,
+  Image,
+} from '@chakra-ui/react'
 
 function GalleryBox(props) {
   const delegate = props.delegate || '[data-fancybox]'
@@ -57,22 +65,22 @@ function Carousel(props) {
 
   function getHtml(rev) {
     const socClass = defineSocial(rev.link)
-    const [img] = props.images.filter(img => img._id === rev._id)
+    const [img] = props.images.filter((img) => img._id === rev._id)
 
     return ReactDOMServer.renderToStaticMarkup(
-      <div className="reviews__review">
-        <p className="reviews__text">{rev.review}</p>
-        <div className="reviews__person">
-          <div className="reviews__wrap">
+      <Box className="reviews__review">
+        <Text className="reviews__text">{rev.review}</Text>
+        <Box className="reviews__person">
+          <Box className="reviews__wrap">
             <img className="reviews__img" src={img.image} />
-          </div>
+          </Box>
           <h3 className="reviews__name">{rev.name}</h3>
           <p className="reviews__event">{rev.event}</p>
           <a href={rev.link} target="blank">
-            <div className={socClass}></div>
+            <Box className={socClass}></Box>
           </a>
-        </div>
-      </div>
+        </Box>
+      </Box>
     )
   }
 

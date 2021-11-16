@@ -1,37 +1,57 @@
-import {Heading} from '@chakra-ui/react'
+import {
+  Heading,
+  Skeleton,
+  SkeletonText,
+  SkeletonCircle,
+  Box,
+} from '@chakra-ui/react'
 import MainLayout from '../components/layouts/mainLayout'
 import {Carousel} from '../components/Fancy/Fancy'
 import isEmpty from '../utils/utils'
+import {useEffect, useState} from 'react'
 
-export default function Reviews({reviews, images}) {
-  const publishedReviews = reviews.filter((rev) => rev.published)
+export default function Reviews() {
+  const [reviews, setReviews] = useState({})
+  const [images, setImages] = useState({})
+  useEffect(async () => {
+    try {
+      const reviewsRes = await fetch(`api/reviews`)
+      const {data: reviewsData} = await reviewsRes.json()
+      const publishedReviews = reviewsData.filter((rev) => rev.published)
+      const imagesRes = await fetch(`api/images`)
+      const {data: imagesData} = await imagesRes.json()
+      setReviews(publishedReviews)
+      setImages(imagesData)
+    } catch (error) {
+      console.log(error)
+    }
+  }, [])
+
   return (
     <MainLayout title="Отзывы">
       <Heading as="h1" textAlign="center" m="40px 0">
         Отзывы
       </Heading>
+
       {!isEmpty(reviews) && !isEmpty(images) ? (
         <Carousel
-          items={publishedReviews}
+          items={reviews}
           images={images}
-          options={{infinite: true}}
+          options={{infinite: true, slidesPerPage: 1}}
         />
       ) : (
-        <p>Загрузка отзывов...</p>
+        <Box maxW="400px" margin="0 auto">
+          <SkeletonText mt="4" noOfLines={4} spacing="4" />
+          <Box display="flex" justifyContent="center" mt={5}>
+            <SkeletonCircle size="40" />
+          </Box>
+
+          <SkeletonText mt="4" noOfLines={2} spacing="4" />
+          <Box display="flex" justifyContent="center" mt={5}>
+            <SkeletonCircle size="10" />
+          </Box>
+        </Box>
       )}
     </MainLayout>
   )
-}
-
-export async function getServerSideProps() {
-  const reviewsRes = await fetch(`${process.env.API_URL}api/reviews`)
-  const {data: reviews} = await reviewsRes.json()
-  const imagesRes = await fetch(`${process.env.API_URL}api/images`)
-  const {data: images} = await imagesRes.json()
-  return {
-    props: {
-      reviews,
-      images,
-    },
-  }
 }

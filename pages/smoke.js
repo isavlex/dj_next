@@ -18,7 +18,11 @@ export default function Smoke() {
       <Flex flexDirection="column" alignItems="center" justifyContent="center">
         <Box position="relative">
           <GalleryBox>
-            <div data-fancybox="video-gallery" data-src={VIDEO_PATH}>
+            <div
+              data-fancybox="video-gallery"
+              data-src={VIDEO_PATH}
+              className="image-box"
+            >
               <div className="play-button"></div>
               <Image
                 src={IMG_PATH}
@@ -34,7 +38,9 @@ export default function Smoke() {
             Для запуска тяжелого дыма используется 20 кг сухого льда, что
             гарантирует высокое качество услуги на площади до 300 метров.
           </Text>
-          <Text fontSize="xl" fontWeight="700">Запуск 15000₽</Text>
+          <Text fontSize="xl" fontWeight="700">
+            Запуск 15000₽
+          </Text>
         </Box>
       </Flex>
     </MainLayout>

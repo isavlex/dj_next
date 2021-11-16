@@ -7,19 +7,23 @@ import {useState, useEffect} from 'react'
 import ReviewsList from '../components/ReviewsList/ReviewsList'
 import Logout from '../components/Logout/Logout'
 
-export default function ReviewsAdmin({reviews}) {
+export default function ReviewsAdmin() {
   const [state, setState] = useState({
-    reviews,
+    reviews: null,
     publishedReviews: null,
     unpublishedReviews: null,
   })
+
+  useEffect(async () => {
+    getReviews()
+  }, [])
 
   useEffect(() => {
     isPublished(state.reviews)
   }, [state.reviews])
 
   async function getReviews() {
-    const reviewsRes = await fetch(`${process.env.API_URL}api/reviews`)
+    const reviewsRes = await fetch(`api/reviews`)
     const {data: reviews} = await reviewsRes.json()
     setState({
       ...state,
@@ -29,19 +33,13 @@ export default function ReviewsAdmin({reviews}) {
 
   async function removeReview(_id) {
     try {
-      const deletedReview = await fetch(
-        `${process.env.API_URL}api/reviews/${_id}`,
-        {
-          method: 'Delete',
-        }
-      )
+      const deletedReview = await fetch(`api/reviews/${_id}`, {
+        method: 'Delete',
+      })
 
-      const deletedImage = await fetch(
-        `${process.env.API_URL}api/images/${_id}`,
-        {
-          method: 'Delete',
-        }
-      )
+      const deletedImage = await fetch(`api/images/${_id}`, {
+        method: 'Delete',
+      })
     } catch (error) {
       console.log(error)
     }
@@ -76,7 +74,7 @@ export default function ReviewsAdmin({reviews}) {
 
   async function changeReview(_id, review) {
     try {
-      const res = await fetch(`${process.env.API_URL}api/reviews/${_id}`, {
+      const res = await fetch(`api/reviews/${_id}`, {
         method: 'PUT',
         headers: {
           Accept: 'application/json',
@@ -101,7 +99,7 @@ export default function ReviewsAdmin({reviews}) {
       review.published = true
     }
 
-    changeReview(_id, review)
+    await changeReview(_id, review)
     getReviews()
   }
 
@@ -112,7 +110,7 @@ export default function ReviewsAdmin({reviews}) {
       </Heading>
       <Flex mt={5} className="flex-center">
         <Box maxW="320px" minW="310px">
-          <Heading as="h2" size="md" mb={30} textAlign="center">
+          <Heading as="h2" size="md" m="15px 0" textAlign="center">
             Опубликованы
           </Heading>{' '}
           <ReviewsList
@@ -122,7 +120,7 @@ export default function ReviewsAdmin({reviews}) {
           />
         </Box>
         <Box maxW="320px" minW="310px">
-          <Heading as="h2" size="md" mb={30} textAlign="center">
+          <Heading as="h2" size="md" m="15px 0" textAlign="center">
             Не опубликованы
           </Heading>
           <ReviewsList
@@ -145,16 +143,9 @@ export async function getServerSideProps(context) {
     const cookies = nookies.get(context)
     const token = await verifyIdToken(cookies.token)
     const {uid, email} = token
-    // connect to db
-    const reviewsRes = await fetch(`${process.env.API_URL}api/reviews`)
-    const {data: reviews} = await reviewsRes.json()
-    const imagesRes = await fetch(`${process.env.API_URL}api/images`)
-    const {data: images} = await imagesRes.json()
 
     return {
       props: {
-        images,
-        reviews,
         session: `Your email is ${email} and your UID is ${uid}.`,
       },
     }
