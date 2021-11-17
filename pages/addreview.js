@@ -28,7 +28,6 @@ import {AiOutlineZoomIn, AiOutlineZoomOut} from 'react-icons/ai'
 import imageCompression from 'browser-image-compression'
 import {useForm} from 'react-hook-form'
 import {useRouter} from 'next/router'
-import {route} from 'next/dist/next-server/server/router'
 
 export default function AddReview() {
   const [chooseImage, setChooseImage] = useState({
@@ -61,7 +60,7 @@ export default function AddReview() {
 
   const addReview = async () => {
     try {
-      const res = await fetch(`${process.env.API_URL}api/reviews`, {
+      const res = await fetch(`api/reviews`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -81,7 +80,7 @@ export default function AddReview() {
       image: chooseImage.cropImage,
     }
     try {
-      const res = await fetch(`${process.env.API_URL}api/images`, {
+      const res = await fetch(`api/images`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -104,7 +103,7 @@ export default function AddReview() {
 
   const sendNotification = async () => {
     try {
-      const res = await fetch(`${process.env.API_URL}api/contact`, {
+      const res = await fetch(`api/contact`, {
         method: 'POST',
         headers: {
           'Contents-Type': 'application/json',
