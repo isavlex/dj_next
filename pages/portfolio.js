@@ -16,10 +16,10 @@ export default function Portfolio() {
     let images = [
       {
         video: true,
-        src: 'https://www.youtube.com/embed/VtqUC3rvhks',
+        src: 'https://www.youtube.com/watch?v=7nXNidDKQo0&t=1s',
         thumb: './img/pics/plug-gallery.jpg',
         caption:
-          'Диджей на свадьбу, корпоратив, юбилей, аренда караоке. Event dj',
+          'Диджей на праздник, выездное караоке.',
       },
       {
         video: true,
